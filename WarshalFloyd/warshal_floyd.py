@@ -49,6 +49,7 @@ class Graph:
 
     def floydwarshall(self):
         M = [[9999 for x in range(len(self.adj))] for y in range(len(self.adj))]
+        poprzednik = [[-1 for x in range(len(self.adj))] for y in range(len(self.adj))]
         for x in range(len(M)):
             for y in range(len(M[0])):
                 if x == y:
@@ -56,13 +57,16 @@ class Graph:
                 exists, edge = self.doesEdgeExist(x, y)
                 if exists:
                     M[x][y] = edge.weight
+                    poprzednik[x][y] = x
+
         for k in range(len(M)):
             for i in range(len(M)):
                 for j in range(len(M)):
                     newDistance = M[i][k] + M[k][j]
                     if newDistance < M[i][j]:
                         M[i][j] = newDistance
-        return M
+                        poprzednik[i][j] = poprzednik[k][j]
+        return (M, poprzednik)
 
 gr = Graph()
 #print(content)
@@ -72,10 +76,10 @@ for i in content:
     gr.addEdge(i[0],i[1],i[2])
     #print(i[0])
 
-M = gr.floydwarshall()
+M, poprz = gr.floydwarshall()
 
-# for k,v in gr.adj.items():
-#     #print(str(k))
-#     print(v)
 for i in range(len(M)):
     print(*M[i], sep='\t')
+
+for i in range(len(poprz)):
+    print(*poprz[i], sep='\t')
