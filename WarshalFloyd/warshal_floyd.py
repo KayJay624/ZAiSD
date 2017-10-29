@@ -54,10 +54,11 @@ class Graph:
             for y in range(len(M[0])):
                 if x == y:
                     M[x][y] = 0
-                exists, edge = self.doesEdgeExist(x, y)
+                exists, edge = self.doesEdgeExist(x+1, y+1)
                 if exists:
                     M[x][y] = edge.weight
-                    poprzednik[x][y] = x
+                    #print(str(x)+","+str(y) + ":::" + str(edge.weight))
+                    poprzednik[x][y] = x+1
 
         for k in range(len(M)):
             for i in range(len(M)):
@@ -68,8 +69,26 @@ class Graph:
                         poprzednik[i][j] = poprzednik[k][j]
         return (M, poprzednik)
 
+def shortestPath(fr, to, M, poprzednik):
+    if (M[fr-1][to-1] != 9999):
+        print("Shortest path from " + str(fr) + " to " + str(to) +": "+ str(M[fr-1][to-1]))
+        printShortestPath(fr,to,M,poprzednik)
+    else:
+        print("Path doesn't exists")
+
+def printShortestPath(fr, to, M, poprzednik):
+    path = [];
+    #print("Shortest path (" + (fr--) + "," + (to--) + ") = [");
+    path.append(to);
+    while (poprzednik[fr-1][to-1] > 0):
+        path.append(poprzednik[fr-1][to-1]);
+        to = poprzednik[fr-1][to-1];
+
+    print(path)
+
 gr = Graph()
 #print(content)
+
 for i in content:
     gr.addVertex(i[0])
     gr.addVertex(i[1])
@@ -77,9 +96,11 @@ for i in content:
     #print(i[0])
 
 M, poprz = gr.floydwarshall()
-
+print(len(gr.adj))
 for i in range(len(M)):
     print(*M[i], sep='\t')
 
 for i in range(len(poprz)):
     print(*poprz[i], sep='\t')
+
+shortestPath(1, 20,M,poprz)
