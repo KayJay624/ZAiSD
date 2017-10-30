@@ -73,6 +73,9 @@ class FlowNetwork:
         return allEdges
 
     def addVertex(self, name, source=False, sink=False):
+        if self.vertexInNetwork(name):
+            #print(name)
+            return 0
         newVertex = Vertex(name, source, sink)
         self.vertices.append(newVertex)
         self.network[newVertex.name] = []
@@ -118,7 +121,7 @@ class FlowNetwork:
         return sum(edge.flow for edge in self.network[source.name])
 
 # gr = FlowNetwork()
-# #print(content)
+#print(content)
 #
 # for i in content:
 #     gr.addVertex(i[0])
@@ -134,43 +137,53 @@ def populate():
     #     fn.addVertex(i[1])
     #     fn.addEdge(i[0],i[1],i[2])
     # fn.setSource(1)
-    fn.addVertex(1)
-    fn.addVertex(10)
-    fn.addVertex(2)
-    fn.addVertex(3)
-    fn.addVertex(4)
-    fn.addVertex(5)
-    fn.addVertex(6)
-    #fn.setSink(10)
+    for i in content:
+        fn.addVertex(i[0])
+        fn.addVertex(i[1])
+        fn.addEdge(i[0],i[1],i[2])
+        #print(i[0])
+
+    # fn.addVertex(1)
+    # fn.addVertex(10)
+    # fn.addVertex(2)
+    # fn.addVertex(3)
+    # fn.addVertex(4)
+    # fn.addVertex(5)
+    # fn.addVertex(6)
+    # #fn.setSink(10)
+    # fn.setSource(1)
+    # fn.addEdge(1, 2, 4)
+    # fn.addEdge(2, 3, 4)
+    # fn.addEdge(3, 10, 2)
+    # fn.addEdge(1, 4, 3)
+    # fn.addEdge(4, 5, 6)
+    # fn.addEdge(5, 10, 6)
+    # fn.addEdge(3, 4, 3)
+    # fn.addEdge(1, 6, 10)
     fn.setSource(1)
-    fn.addEdge(1, 2, 4)
-    fn.addEdge(2, 3, 4)
-    fn.addEdge(3, 10, 2)
-    fn.addEdge(1, 4, 3)
-    fn.addEdge(4, 5, 6)
-    fn.addEdge(5, 10, 6)
-    fn.addEdge(3, 4, 3)
-    fn.addEdge(1, 6, 10)
+    print(fn.adj)
     return fn
 
 res = []
+# fn = populate()
+# for v in fn.vertices:
+#     if v.name != 109:
+#         fn = populate()
+#         fn.setSink(v.name)
+#         mf = fn.calculateMaxFlow()
+#         res.append((v.name, mf))
+
+
+# print(res)
+# from operator import itemgetter
+# a = max(res,key=lambda x:x[1])
+# print("Max flow: " + str(a))
+
 fn = populate()
-for v in fn.vertices:
-    if v.name != 1:
-        fn = populate()
-        fn.setSink(v.name)
-        mf = fn.calculateMaxFlow()
-        res.append((v.name, mf))
+fn.setSink(20)
 
-
-print(res)
-from operator import itemgetter
-a = max(res,key=lambda x:x[1])
-print("Max flow: " + str(a))
-
-fn = populate()
-fn.setSink(10)
-# print(fn.adj)
+print(fn)
+#print(fn.adj)
 # [print(e.start + " -> " + e.end + " flow:" +
 # str(e.flow) + " capacity: " + str(e.capacity)) for e in fn.getEdges()]
 print(fn.calculateMaxFlow())
