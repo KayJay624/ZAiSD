@@ -1,12 +1,12 @@
 import numpy as np
 
-with open('duzy_graf.txt', 'r') as myfile:
+with open('test_graf.txt', 'r') as myfile:
     content = myfile.readlines()
 
 content = [x.strip() for x in content]
 content = [x.replace(" ", "") for x in content]
 content = [x.split(';') for x in content]
-content = [[int(j) for j in i] for i in content]
+content = [[float(j) for j in i] for i in content]
 
 class Vertex:
     def __init__(self, name, source=False, sink=False):
@@ -94,17 +94,17 @@ class FlowNetwork:
         self.network[returnVertex.name].append(returnEdge)
         self.adj[start].append(end)
 
-    # def getPath(self, start, end, path):
-    #     if start == end:
-    #         return path
-    #     for edge in self.network[start]:
-    #         residualCapacity = edge.capacity - edge.flow
-    #         if residualCapacity > 0 and not (edge, residualCapacity) in path:
-    #             result = self.getPath(edge.end, end, path + [(edge, residualCapacity)])
-    #             if result != None:
-    #                 return result
-    #
-    #
+    def getPath(self, start, end, path):
+        if start == end:
+            return path
+        for edge in self.network[start]:
+            residualCapacity = edge.capacity - edge.flow
+            if residualCapacity > 0 and not (edge, residualCapacity) in path:
+                result = self.getPath(edge.end, end, path + [(edge, residualCapacity)])
+                if result != None:
+                    return result
+    
+    
     # def __findPathDFS(self, current, goal, visited):
     #     if current == goal:
     #         return [current]
@@ -133,6 +133,8 @@ class FlowNetwork:
     #     return self.__findPathDFS(start, goal, visited)
     def bfs(self, start, end):
         queue = []
+        visited = []
+        visited.append(start)
         queue.append([(Edge(start, start, 0), 0)])
         while queue:
             path = queue.pop(0)
@@ -143,34 +145,57 @@ class FlowNetwork:
 
             for edge in self.network[node]:
                 residualCapacity = edge.capacity - edge.flow
-                if residualCapacity > 0 and not (edge, residualCapacity) in path:
+                #print(not (edge, residualCapacity) in path)
+                
+                if residualCapacity > 0 and not edge.end in visited:
                     new_path = list(path)
                     new_path.append((edge, residualCapacity))
-                    print(new_path)
+                    #print(node)
                     queue.append(new_path)
+                    visited.append(edge.end)
         return None
 
-    def find_all_paths(self, start, end, path=[]):
-        path = path + [start]
-        if start == end:
-            return [path]
-        if not start in self.adj:
-            return []
-        paths = []
+    # def dfs(self, start, end):
+    #     stack = []
+    #     stack.append([(Edge(start, start, 0), 0)])
+    #     while stack:
+    #         path = stack.pop(0)
+    #         node = path[-1][0].end
+            
 
-        for edge in self.network[start]:
-            residualCapacity = edge.capacity - edge.flow
-            if residualCapacity > 0 and not (edge) in path:
-        #for node in self.adj[start]:
-        #    if node not in path:
-                newpaths = self.find_all_paths(edge.end, end, path)
-                for newpath in newpaths:
-                    paths.append(newpath)
-        return paths
+    #         for edge in self.network[node]:               
+    #             residualCapacity = edge.capacity - edge.flow
+    #             #print(not (edge, residualCapacity) in path)
+    #             if residualCapacity > 0 and not (edge, residualCapacity) in path:
+    #                 new_path = list(path)
+    #                 new_path.append((edge, residualCapacity))
+    #                 #print(new_path)
+    #                 stack.append(new_path)
+    #     path.pop(0)
+    #     return path.append((edge, residualCapacity))
+    # def find_all_paths(self, start, end, path=[]):
+    #     path = path + [start]
+    #     if start == end:
+    #         return [path]
+    #     if not start in self.adj:
+    #         return []
+    #     paths = []
+
+    #     for edge in self.network[start]:
+    #         residualCapacity = edge.capacity - edge.flow
+    #         if residualCapacity > 0 and not (edge) in path:
+    #     #for node in self.adj[start]:
+    #     #    if node not in path:
+    #             newpaths = self.find_all_paths(edge.end, end, path)
+    #             for newpath in newpaths:
+    #                 paths.append(newpath)
+    #     return paths
 
     def calculateMaxFlow(self):
         source = self.getSource()
         sink = self.getSink()
+        print(source)
+        print(sink)
         if source == None or sink == None:
             return "Network does not have source and sink"
         #path = self.getPath(source.name, sink.name, [])
@@ -197,47 +222,40 @@ class FlowNetwork:
 # [print(x.name) for x in gr.vertices]
 def populate():
     fn = FlowNetwork()
-    for i in content:
-        fn.addVertex(i[0])
-        fn.addVertex(i[1])
-        fn.addEdge(i[0],i[1],i[2])
+    # for i in content:
+    #     fn.addVertex(i[0])
+    #     fn.addVertex(i[1])
+    #     fn.addEdge(i[0],i[1],i[2])
 
-    fn.setSource(109)
+    # fn.setSource(0)
     # for i in content:
     #     fn.addVertex(i[0])
     #     fn.addVertex(i[1])
     #     fn.addEdge(i[0],i[1],i[2])
         #print(i[0])
 
-    # fn.addVertex('s')
-    # fn.addVertex('a')
-    # fn.addVertex('b')
-    # fn.addVertex('c')
-    # fn.addVertex('d')
+    fn.addVertex('s')
+    fn.addVertex('c')
+    fn.addVertex('d')
     # fn.addVertex('e')
-    # fn.addVertex('t')
-    # fn.addEdge('s', 'a', 4)
-    # fn.addEdge('a', 'b', 4)
-    # fn.addEdge('b', 't', 2)
-    # fn.addEdge('s', 'c', 3)
-    # fn.addEdge('c', 'd', 6)
-    # fn.addEdge('d', 't', 6)
-    # fn.addEdge('a', 'c', 3)
-    # fn.addEdge('b', 'd', 3)
-    # fn.addEdge('d', 'a', 5)
-    # fn.addEdge('b', 'c', 3)
-    # fn.addEdge('s', 'e', 5)
-    # fn.addEdge('e', 't', 5)
-    # fn.addEdge('b', 's', 3)
-    # fn.addEdge('e', 'd', 3)
+    fn.addVertex('t')
+    fn.addVertex('a')
+    fn.addVertex('b')
+    fn.addEdge('s', 'a', 4)
+    fn.addEdge('a', 'b', 4)
+    fn.addEdge('b', 't', 2)
+    fn.addEdge('s', 'c', 3)
+    fn.addEdge('c', 'd', 6)
+    fn.addEdge('d', 't', 6)
+    fn.addEdge('b', 'c', 3)
     #
-    # fn.setSource('s')
+    fn.setSource('s')
     return fn
 
-res = []
+# res = []
 # fn = populate()
 # for v in fn.vertices:
-#     if v.name != 109:
+#     if v.name != 43:
 #         fn = populate()
 #         fn.setSink(v.name)
 #         mf = fn.calculateMaxFlow()
@@ -250,8 +268,8 @@ res = []
 # print("Max flow: " + str(a))
 
 fn = populate()
-fn.setSink(609)
-
+fn.setSink('t')
+#print(content)
 #print(fn)
 #print(fn.adj)
 # [print(e.start + " -> " + e.end + " flow:" +
@@ -260,4 +278,4 @@ print("Max flow:")
 print(fn.calculateMaxFlow())
 # [print(e.start + " -> " + e.end + " flow:" +
 # str(e.flow) + " capacity: " + str(e.capacity)) for e in fn.getEdges()]
-#print(fn.find_all_paths(1,20,[]))
+#print(fn.bfs(1,20))
