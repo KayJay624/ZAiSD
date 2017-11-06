@@ -1,16 +1,17 @@
-def last_occurrence(pattern, alphabet):
-    occurrences = dict()
-    for letter in alphabet:
-        occurrences[letter] = pattern.rfind(letter)
+def last_occurrence(pattern, text):
+    occurrences = {}
+    for i, letter in enumerate(text):
+        if (letter in pattern):
+            if (not letter in occurrences):
+                occurrences[letter] = i
+        else:
+            occurrences[letter] = -1
 
     return occurrences
 
 def boyer_moore(text, pattern):
-    """Find occurrence of pattern in text."""
     results = []
-    alphabet = set(text)
-    print(alphabet)
-    last = last_occurrence(pattern, alphabet)
+    last = last_occurrence(pattern, text)
     #print("last:", last)
     m = len(pattern)
     n = len(text)
@@ -19,37 +20,43 @@ def boyer_moore(text, pattern):
     while i < n:
         if pattern[j] == text[i]:
             if j == 0:
-                results.append(i)
-                l = last[text[i]]
-                i = i + m - min(j, 1+l)
+                results.append(i)  #jest dopasowanie
+                i = i + m - min(j, 1 + last[text[i]])
                 j = m - 1
             else:
                 i -= 1
                 j -= 1
         else:
-            l = last[text[i]]
-            i = i + m - min(j, 1+l)
+            i = i + m - min(j, 1 + last[text[i]])
             j = m - 1 
     
     return results
 
+def get_word(index, pattern, text):
+    i = index
+    while text[i] != ' ':
+        i -= 1
 
+    j = index + len(pattern)
+    while text[j] != ' ':
+        j +=1
 
-### TEST FUNCTION ###
+    return text[i:j]
 
-if __name__ == '__main__':
-        
-    def show_match(text, pattern):
-        #print('Text:  %s' % text)
-        results = boyer_moore(text, pattern)
-        print("results: ", results)
-        # for p in results:
-        #     print('Match: %s%s' % ('.'*p, pattern))
+#################################################################
 
-    fname = "seneca.txt"
-    with open(fname) as f:
-       text = f.read().replace('\n', ' ')
-    
-    #text = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
-    pattern = 'omne'
-    show_match(text, pattern)
+fname = "seneca.txt"
+with open(fname) as f:
+    text = f.read().replace('\n', ' ')
+pattern = 'omne'
+
+# text = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
+# pattern = "lo"
+
+results = boyer_moore(text, pattern)
+print("Liczba wystąpień '",pattern,"': ", len(results))
+#print("results: ", results)
+
+for r in results:
+    print(r, ":", get_word(r, pattern, text))
+
