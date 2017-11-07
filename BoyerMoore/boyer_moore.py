@@ -47,11 +47,8 @@ def get_word(index, pattern, text):
 
 fname = "seneca.txt"
 with open(fname) as f:
-    text = f.read().replace('\n', ' ')
+    text = f.read().replace('\n', ' ').lower()
 pattern = 'omne'
-
-# text = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
-# pattern = "lo"
 
 results = boyer_moore(text, pattern)
 print("Liczba wystąpień '",pattern,"': ", len(results))
