@@ -3,10 +3,10 @@
 #include <math.h>
 
 #define dot(u,v)   ((u).x * (v).x + (u).y * (v).y + (u).z * (v).z)
-#define norm(v)     sqrt(dot(v,v))     // norm = length of  vector
-#define d(u,v)      norm(u-v)          // distance = norm of difference
-#define SMALL_NUM   0.00000001 // anything that avoids division overflow
-#define abs(x)     ((x) >= 0 ? (x) : -(x))   //  absolute value
+#define norm(v)     sqrt(dot(v,v))            // norm = length of  vector
+#define d(u,v)      norm(u-v)                 // distance = norm of difference
+#define SMALL_NUM   0.00000001                // anything that avoids division overflow
+#define abs(x)     ((x) >= 0 ? (x) : -(x))    //  absolute value
 
 using namespace std;
 
@@ -36,6 +36,13 @@ class Vector
     {
       return Vector(this->x - v2.x, this->y - v2.y, this->z - v2.z);
     }
+
+    Vector operator*(const Vector& v2)
+    {
+      return Vector(this->y * v2.z - this->z * v2.y,
+                    this->z * v2.x - this->x * v2.z,
+                    this->x * v2.y - this->y * v2.x);
+    }
 };
 
 ostream& operator<<(ostream& os, const Vector& v)
@@ -57,7 +64,7 @@ class Point
     friend ostream& operator<<(ostream& os, const Point& p);
     Vector operator-(const Point& p2)
     {
-      return Vector(this->x - p2.x, this->y - p2.y, this->z - p2.y);
+      return Vector(this->x - p2.x, this->y - p2.y, this->z - p2.z);
     }
     Point operator+(const Vector& v)
     {
@@ -128,6 +135,21 @@ ostream& operator<<(ostream& os, const Solid& s)
 
     return os;
 }
+//////////////////
+class Plane
+{
+public:
+  Point v1;
+  Vector n;
+
+  Plane(Face f)
+  {
+      this->v1 = f.v1;
+      Vector u = f.v2 - f.v1;
+      Vector v = f.v3 - f.v1;
+      this->n = u * v;
+  }
+};
 ///////////////////////////////////////////////////////////////////////////////////
 double distance(const Point& p1, const Point& p2)
 {
@@ -223,16 +245,32 @@ double distance(Edge e1, Edge e2)
 
     return norm(dP);   // return the closest distance
 }
+
+double distance(Face f, Point p)
+{
+    double sb, sn, sd;
+    Point b;
+    Plane pl = Plane(f);
+
+    sn = -dot( pl.n, (p - pl.v1));
+    sd = dot(pl.n, pl.n);
+    sb = sn / sd;
+
+    b = p + (pl.n * sb);
+    return d(p, b);
+}
 ///////////////////////////////////////////////////////////////////////////////////
 int main()
 {
     Point p1 = Point(1,2,3);
     Point p2 = Point(11,12,13);
-    Point p3 = Point(21,22,23);
+    Point p3 = Point(10,22,5);
+    Point p0 = Point(0, 0, 0);
 
     Face f1 = Face(p1, p2, p3);
     Face f2 = Face(p2, p1, p3);
     Face f3 = Face(p3, p2, p1);
+
     Edge e1 = Edge(p1, p2);
     Edge e2 = Edge(p2, p3);
 
@@ -246,6 +284,7 @@ int main()
     cout << distance(p1, p2) << endl;
     cout << distance(e1, p3) << endl;
     cout << distance(e1, e2) << endl;
+    cout << distance(f1, p0) << endl;
     return 0;
 
 }
