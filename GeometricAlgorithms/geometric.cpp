@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <algorithm>
 
 #define dot(u,v)   ((u).x * (v).x + (u).y * (v).y + (u).z * (v).z)
 #define norm(v)     sqrt(dot(v,v))            // norm = length of  vector
@@ -259,6 +260,38 @@ double distance(Face f, Point p)
     b = p + (pl.n * sb);
     return d(p, b);
 }
+
+double distance(Edge e, Face f)
+{
+    Edge e1 = Edge(f.v1, f.v2);
+    Edge e2 = Edge(f.v2, f.v3);
+    Edge e3 = Edge(f.v1, f.v3);
+
+    double d1 = distance(e, e1);
+    double d2 = distance(e, e2);
+    double d3 = distance(e, e3);
+
+    return min({d1, d2, d3});
+}
+
+double distance(Face f1, Face f2)
+{
+  Edge e1 = Edge(f1.v1, f1.v2);
+  Edge e2 = Edge(f1.v2, f1.v3);
+  Edge e3 = Edge(f1.v1, f1.v3);
+
+  double d1 = distance(e1, f2);
+  double d2 = distance(e2, f2);
+  double d3 = distance(e3, f2);
+
+  return  min({d1, d2, d3});
+}
+
+double distance(Solid s1, Solid s2)
+{
+  return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 int main()
 {
@@ -266,13 +299,17 @@ int main()
     Point p2 = Point(11,12,13);
     Point p3 = Point(10,22,5);
     Point p0 = Point(0, 0, 0);
+    Point p4 = Point(1,4,8);
+    Point p5 = Point(6,2,34);
 
     Face f1 = Face(p1, p2, p3);
     Face f2 = Face(p2, p1, p3);
     Face f3 = Face(p3, p2, p1);
+    Face f4 = Face(p0, p4, p5);
 
     Edge e1 = Edge(p1, p2);
     Edge e2 = Edge(p2, p3);
+    Edge e3 = Edge(p0, p4);
 
     vector<Face> faces = {f1,f2,f3};
     Solid s = Solid(faces);
@@ -285,6 +322,8 @@ int main()
     cout << distance(e1, p3) << endl;
     cout << distance(e1, e2) << endl;
     cout << distance(f1, p0) << endl;
+    cout << "Edge - face: " << distance(e3, f1) << endl;
+    cout << "Face - face: " << distance(f1, f4) << endl;
     return 0;
 
 }
